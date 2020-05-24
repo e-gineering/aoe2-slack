@@ -82,7 +82,7 @@ public class SlackBotSlashCommandController {
     @PostMapping(path = "/aoe2")
     public ResponseEntity<String> getRating(@RequestParam(name = "text") String commandText) {
 
-        getProfileMappings();
+
 
         try {
 
@@ -97,7 +97,16 @@ public class SlackBotSlashCommandController {
                         .headers(responseHeaders)
                         .body(SlackMatchResult.getSlackResponseForMatchResult(matchResult));
 
-            } else {
+            } else if (commandText.startsWith("refresh-profile-map")) {
+                getProfileMappings();
+
+                SlackSlashCommandResponse slackSlashCommandResponse = new SlackSlashCommandResponse("Profile map duly refreshed!");
+                ObjectMapper objectMapper = new ObjectMapper();
+                StringWriter stringWriter = new StringWriter();
+                objectMapper.writeValue(stringWriter, slackSlashCommandResponse);
+                return new ResponseEntity<String>(stringWriter.toString(), HttpStatus.OK);
+            }
+            else {
                 RatingRecord ratingRecord = ratingService.getMostRecentRating(aoe2UserConfigs, commandText);
                 SlackSlashCommandResponse slackSlashCommandResponse = new SlackSlashCommandResponse("Team Random Map Rank: " +
                         ratingRecord.getRating() + " as of " + DateTimeFormatter.RFC_1123_DATE_TIME.format(ratingRecord.getDate()));
