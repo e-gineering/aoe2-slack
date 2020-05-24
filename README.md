@@ -1,5 +1,5 @@
 # aoe2-slack
-Slack Integration for AOE2
+Slack Integration for AOE2, Definitive Edition
 
 This is VERY VERY dependent on this API:  https://aoe2.net/#api.  Many thanks to the folks maintaining it!
 
@@ -60,6 +60,11 @@ Frodo (Lithuanians)  Rating (984)
 Team 2
 Gandalf (Japanese)  Rating (1121)
 Golem (Goths)  Rating (1061)*
+
+#### Last Match
+To refresh the profile name -> steam id map that's stored in the pinned message:
+
+`/aoe2 refresh-profile-map`
 
 If you want to change the formatting on the message, this is a very handy tool:
 
