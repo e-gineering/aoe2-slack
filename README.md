@@ -61,6 +61,11 @@ Team 2
 Gandalf (Japanese)  Rating (1121)
 Golem (Goths)  Rating (1061)*
 
+#### Last Match
+To refresh the profile name -> steam id map that's stored in the pinned message:
+
+`/aoe2 refresh-profile-map`
+
 If you want to change the formatting on the message, this is a very handy tool:
 
 https://api.slack.com/tools/block-kit-builder
