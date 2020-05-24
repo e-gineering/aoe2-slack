@@ -61,7 +61,7 @@ Team 2
 Gandalf (Japanese)  Rating (1121)
 Golem (Goths)  Rating (1061)*
 
-#### Last Match
+#### Profile Map Refresh
 To refresh the profile name -> steam id map that's stored in the pinned message:
 
 `/aoe2 refresh-profile-map`
