@@ -1,5 +1,5 @@
 # aoe2-slack
-Slack Integration for AOE2
+Slack Integration for AOE2, Definitive Edition
 
 This is VERY VERY dependent on this API:  https://aoe2.net/#api.  Many thanks to the folks maintaining it!
 
