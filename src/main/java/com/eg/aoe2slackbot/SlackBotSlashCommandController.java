@@ -1,18 +1,20 @@
 package com.eg.aoe2slackbot;
 
 
-import com.eg.aoe2slackbot.entity.Aoe2UserConfig;
-import com.eg.aoe2slackbot.entity.MatchResult;
-import com.eg.aoe2slackbot.entity.RatingRecord;
-import com.eg.aoe2slackbot.entity.SlackSlashCommandResponse;
+import com.eg.aoe2slackbot.entity.*;
 import com.eg.aoe2slackbot.service.MatchService;
 import com.eg.aoe2slackbot.service.RatingService;
 import com.eg.aoe2slackbot.view.SlackMatchResult;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.slack.api.Slack;
 import com.slack.api.methods.request.pins.PinsListRequest;
 import com.slack.api.methods.response.pins.PinsListResponse;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,6 +45,15 @@ public class SlackBotSlashCommandController {
     public SlackBotSlashCommandController(RatingService ratingService, MatchService matchService) {
         this.ratingService = ratingService;
         this.matchService = matchService;
+    }
+
+    @PostConstruct
+    public void init() throws Exception {
+        LOG.info("Initializing profile name -> steam id map from pinned slack message..");
+
+        getProfileMappings();
+
+        LOG.info("Profile map initialization complete!");
     }
 
     @GetMapping(path="/aoe2/profileMap")
@@ -82,8 +95,6 @@ public class SlackBotSlashCommandController {
     @PostMapping(path = "/aoe2")
     public ResponseEntity<String> getRating(@RequestParam(name = "text") String commandText) {
 
-        getProfileMappings();
-
         try {
 
             if (commandText.startsWith("last-match")) {
@@ -97,7 +108,16 @@ public class SlackBotSlashCommandController {
                         .headers(responseHeaders)
                         .body(SlackMatchResult.getSlackResponseForMatchResult(matchResult));
 
-            } else {
+            } else if (commandText.startsWith("refresh-profile-map")) {
+                getProfileMappings();
+
+                SlackSlashCommandResponse slackSlashCommandResponse = new SlackSlashCommandResponse("Profile map duly refreshed!");
+                ObjectMapper objectMapper = new ObjectMapper();
+                StringWriter stringWriter = new StringWriter();
+                objectMapper.writeValue(stringWriter, slackSlashCommandResponse);
+                return new ResponseEntity<String>(stringWriter.toString(), HttpStatus.OK);
+            }
+            else {
                 RatingRecord ratingRecord = ratingService.getMostRecentRating(aoe2UserConfigs, commandText);
                 SlackSlashCommandResponse slackSlashCommandResponse = new SlackSlashCommandResponse("Team Random Map Rank: " +
                         ratingRecord.getRating() + " as of " + DateTimeFormatter.RFC_1123_DATE_TIME.format(ratingRecord.getDate()));
