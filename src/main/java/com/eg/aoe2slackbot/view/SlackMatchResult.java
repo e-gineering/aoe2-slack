@@ -32,8 +32,6 @@ public class SlackMatchResult {
 
         List<LayoutBlock> messageList = new ArrayList<>();
 
-        NumberFormat formatter = new DecimalFormat("#0.00");
-
         SectionBlock titleBlock = SectionBlock
                 .builder()
                 .text(MarkdownTextObject
@@ -45,7 +43,7 @@ public class SlackMatchResult {
                                         RefDataService.aoe2RefData.getMapTypeMap().get(matchResult.getMatch().getMapType()) +
                                 "* of size " + RefDataService.aoe2RefData.getMapSizeMap().get(matchResult.getMatch().getMapSize()) +
                                 ".  \nThe match concluded at " + DateTimeFormatter.RFC_1123_DATE_TIME.format(matchResult.getMatch().getFinishedDate()) +
-                                " after lasting " + formatter.format((double) matchDuration.toMinutes() / 60.0) + " Hours")
+                                " after lasting " + durationAsString(matchDuration))
                         .build())
                 .build();
 
@@ -110,6 +108,13 @@ public class SlackMatchResult {
 
         return "<https://aoe2.net/#profile-" + steamId + "|" + name + ">";
 
+    }
+
+    // package private for accessibility in tests
+    static String durationAsString(Duration duration) {
+        long hours = duration.toHours();
+        long minutes = duration.toMinutes();
+        return hours + ":" + String.format("%02d", minutes - 60 * hours);
     }
 
 
